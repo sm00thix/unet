@@ -7,7 +7,7 @@ The UNet class provides two options for upsampling:
 2. bilinear = True: Bilinear upsampling followed by convolution.
 
 It also contains options for padding.
-1. pad = True: The input size is retained in the output by zero-padding convolutions and, if necessary, the result of the upsampling.
+1. pad = True: The input size is retained in the output by zero-padding convolutions and, if necessary, the results of the upsampling operations.
 2. pad = False: The output is smaller than the input as in the original implementation.
 
 Finally, it contains options for adding a normalization layer after the non-linearity (ReLU), which follows each convolution and transposed convolution.
