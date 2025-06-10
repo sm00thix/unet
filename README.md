@@ -1,5 +1,5 @@
 # U-Net
-This repository contains an implementation of U-Net [[1]](#references). unet.py implements the class UNet.
+This repository contains an implementation of U-Net [[1]](#references). [unet.py](https://github.com/sm00thix/unet/blob/main/unet.py) implements the class UNet.
 
 ## Options
 The UNet class provides two options for upsampling:
