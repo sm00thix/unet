@@ -106,7 +106,7 @@ def layer_norm(in_channels: int) -> nn.Sequential:
     return nn.Sequential(*layers)
 
 
-def get_norm_layer(normalization: None | str, in_channels: int) -> nn.Sequential:
+def get_norm_layer(normalization: None | str, in_channels: int) -> nn.Module:
     """
     Get the normalization layer based on the specified type.
     Either 'bn' for batch normalization, 'ln' for layer normalization,
@@ -116,7 +116,7 @@ def get_norm_layer(normalization: None | str, in_channels: int) -> nn.Sequential
         return batch_norm(in_channels)
     if normalization == "ln":
         return layer_norm(in_channels)
-    return nn.Sequential(nn.Identity())
+    return nn.Identity()
 
 
 def copy_and_crop(large: torch.Tensor, small: torch.Tensor) -> torch.Tensor:
