@@ -298,18 +298,18 @@ class UNet(nn.Module):
     """
     in_channels: Number of input channels
     out_channels: Number of output channels
-    normalization: None | str, if 'bn' use batch normalization, if 'ln' use layer normalization
-    bilinear: bool, if True use bilinear upsampling, if False use transposed convolution
     pad: bool, if True use padding in the convolution layers, preserving the input size
+    bilinear: bool, if True use bilinear upsampling, if False use transposed convolution
+    normalization: None | str, if 'bn' use batch normalization, if 'ln' use layer normalization
     """
 
     def __init__(
         self,
         in_channels: int,
         out_channels: int,
-        pad: bool,
-        bilinear: bool,
-        normalization: None | str,
+        pad: bool = True,
+        bilinear: bool = True,
+        normalization: None | str = None,
     ):
         super().__init__()
         self.in_channels = in_channels
