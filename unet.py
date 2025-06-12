@@ -296,11 +296,24 @@ class ExpansionBlock(nn.Module):
 
 class UNet(nn.Module):
     """
-    in_channels: Number of input channels
-    out_channels: Number of output channels
-    pad: bool, if True use padding in the convolution layers, preserving the input size
-    bilinear: bool, if True use bilinear upsampling, if False use transposed convolution
-    normalization: None | str, if 'bn' use batch normalization, if 'ln' use layer normalization
+    in_channels : int\\
+        Number of input channels.
+
+    out_channels : int\\
+        Number of output channels
+
+    pad : bool, default=True\\
+        If True use padding in the convolution layers, preserving the input size.
+        If False, the output size will be reduced compared to the input size.
+
+    bilinear : bool, default=True\\
+        If True use bilinear upsampling.
+        If False use transposed convolution.
+
+    normalization: None | str, default=None\\
+        If None use no normalization.
+        If 'bn' use batch normalization.
+        If 'ln' use layer normalization.
     """
 
     def __init__(
