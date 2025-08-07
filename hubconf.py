@@ -90,6 +90,32 @@ def unet(pretrained=False, in_channels=3, out_channels=1, return_logits=False, p
     return model
 
 
+def unet_logits(pretrained=False, in_channels=3, out_channels=1, **kwargs):
+    """
+    U-Net model that returns logits (raw output before activation)
+    
+    This is a convenience function to create a U-Net model with return_logits=True.
+    
+    Args:
+        in_channels (int): Number of input channels (default: 3)
+        out_channels (int): Number of output channels (default: 1)
+        **kwargs: Additional arguments passed to the base unet function
+        
+    Returns:
+        torch.nn.Module: U-Net model that returns logits
+    
+    Example:
+        >>> model = torch.hub.load('sm00thix/unet', 'unet_logits', in_channels=3, out_channels=1)
+    """
+    return unet(
+        pretrained=pretrained,
+        in_channels=in_channels,
+        out_channels=out_channels,
+        return_logits=True,
+        **kwargs
+    )
+
+
 def unet_bn(pretrained=False, in_channels=3, out_channels=1, **kwargs):
     """
     U-Net model with Batch Normalization
@@ -222,11 +248,20 @@ def model_info(model_name='unet'):
             'default_params': {
                 'in_channels': 3,
                 'out_channels': 1,
+                'return_logits': False,
                 'pad': True,
                 'bilinear': True,
                 'normalization': None
             },
             'use_cases': ['General semantic segmentation', 'Custom configuration'],
+        },
+        'unet_logits': {
+            'description': 'U-Net that returns logits (raw output before activation)',
+            'intermediate_channels': [64, 128, 256, 512, 1024],
+            'default_params': {
+                'return_logits': True
+            },
+            'use_cases': ['Useful for custom loss functions or torch.nn.BCEWithLogitsLoss'],
         },
         'unet_bn': {
             'description': 'U-Net with Batch Normalization',
@@ -249,7 +284,7 @@ def model_info(model_name='unet'):
             'intermediate_channels': [64, 128, 256, 512, 1024],
             'default_params': {
                 'in_channels': 1,
-                'normalization': 'bn'
+                'out_channels': 1,
             },
             'use_cases': ['Medical image segmentation', 'Grayscale images'],
         },
