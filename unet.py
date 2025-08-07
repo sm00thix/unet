@@ -357,6 +357,9 @@ class UNet(nn.Module):
         self.last_conv = nn.Conv2d(
             self.intermediate_channels[0], out_channels, kernel_size=1
         )
+        if not self.return_logits:
+            self.sigmoid = nn.Sigmoid()
+
         self.contraction1 = self._get_contraction_block(
             in_channels=self.intermediate_channels[0],
             out_channels=self.intermediate_channels[1],
@@ -439,5 +442,5 @@ class UNet(nn.Module):
         if self.return_logits:
             return x
         else:
-            x = torch.sigmoid(x)
+            x = self.sigmoid(x)
         return x
