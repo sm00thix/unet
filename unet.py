@@ -287,7 +287,7 @@ class ExpansionBlock(nn.Module):
             pad_top = diff_h // 2
             pad_bottom = diff_h - pad_top
             x = F.pad(
-                x, (pad_left, pad_right, pad_top, pad_bottom), mode="constant", value=0
+                x, (pad_left, pad_right, pad_top, pad_bottom), mode="constant", value=0.0
             )
         x = copy_and_crop(large, x)
         x = self.conv_block(x)
