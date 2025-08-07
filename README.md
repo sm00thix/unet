@@ -1,7 +1,8 @@
 # U-Net
 This repository contains an implementation of U-Net [[1]](#references). [unet.py](https://github.com/sm00thix/unet/blob/main/unet.py) implements the class UNet. The implementation has been tested with PyTorch 2.7.1 and CUDA 12.6.
 
-If you use the code shared in this repository, please cite: https://arxiv.org/abs/2504.14131.
+If you use the code shared in this repository, please cite this work: https://arxiv.org/abs/2504.14131. The U-Net implementation in this repository was used to generate pixel-wise fat predictions in an image of a pork belly.
+![](./assets/unet_flow.png)
 
 ## Options
 The UNet class provides two options for upsampling:
