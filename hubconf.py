@@ -12,7 +12,7 @@ dependencies = ['torch']
 # Import the U-Net implementation
 from unet import UNet as _UNet
 
-def unet(pretrained=False, in_channels=3, out_channels=1, pad=True, bilinear=True, normalization=None, **kwargs):
+def unet(pretrained=False, in_channels=3, out_channels=1, return_logits=False, pad=True, bilinear=True, normalization=None, **kwargs):
     """
     U-Net model for semantic segmentation
     
@@ -23,6 +23,7 @@ def unet(pretrained=False, in_channels=3, out_channels=1, pad=True, bilinear=Tru
         pretrained (bool): If True, returns a model pre-trained on a dataset (not yet available)
         in_channels (int): Number of input channels (default: 3 for RGB images)
         out_channels (int): Number of output channels/classes (default: 1 for binary segmentation)
+        return_logits (bool): If True, the model returns logits (raw output before sigmoid activation).
         pad (bool): If True, the input size is preserved by zero-padding convolutions and, if necessary, the results of the upsampling operations.
                     If False, output size will be reduced compared to input size (default: True)
         bilinear (bool): If True, use bilinear upsampling. If False, use transposed convolution (default: True)
@@ -73,6 +74,7 @@ def unet(pretrained=False, in_channels=3, out_channels=1, pad=True, bilinear=Tru
     model = _UNet(
         in_channels=in_channels,
         out_channels=out_channels,
+        return_logits=return_logits,
         pad=pad,
         bilinear=bilinear,
         normalization=normalization
@@ -148,8 +150,7 @@ def unet_medical(pretrained=False, **kwargs):
     """
     U-Net model configured for medical image segmentation
     
-    Configured with grayscale input (typical for medical images) and
-    batch normalization for stable training.
+    Configured with grayscale input (typical for medical images) and binary output (e.g., organ/background segmentation).
     
     Args:
         pretrained (bool): If True, returns a model pre-trained on a dataset (not yet available)
@@ -166,11 +167,8 @@ def unet_medical(pretrained=False, **kwargs):
     """
     return unet(
         pretrained=pretrained,
-        in_channels=1,  # Grayscale medical images
-        out_channels=1,  # Binary segmentation (e.g., organ/background)
-        normalization='bn',
-        pad=True,
-        bilinear=True,
+        in_channels=1,
+        out_channels=1,
         **kwargs
     )
 

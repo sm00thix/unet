@@ -302,6 +302,10 @@ class UNet(nn.Module):
     out_channels : int\\
         Number of output channels
 
+    return_logits : bool, default=False\\
+        If True, the model returns logits (raw output before sigmoid activation).
+        If False, the model applies a sigmoid activation to the output.
+
     pad : bool, default=True\\
         If True use padding in the convolution layers, preserving the input size.
         If False, the output size will be reduced compared to the input size.
@@ -320,6 +324,7 @@ class UNet(nn.Module):
         self,
         in_channels: int,
         out_channels: int,
+        return_logits: bool = False,
         pad: bool = True,
         bilinear: bool = True,
         normalization: None | str = None,
@@ -327,6 +332,7 @@ class UNet(nn.Module):
         super().__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
+        self.return_logits = return_logits
         self.pad = pad
         self.bilinear = bilinear
         self.normalization = normalization
@@ -430,4 +436,8 @@ class UNet(nn.Module):
         x = self.expansion2(x2, x)
         x = self.expansion1(x1, x)
         x = self.last_conv(x)
+        if self.return_logits:
+            return x
+        else:
+            x = torch.sigmoid(x)
         return x
