@@ -10,7 +10,7 @@ Email: ocge@foss.dk
 dependencies = ['torch']
 
 # Import the U-Net implementation
-from unet import UNet
+from unet import UNet as _UNet
 
 def unet(pretrained=False, in_channels=3, out_channels=1, pad=True, bilinear=True, normalization=None, **kwargs):
     """
@@ -70,7 +70,7 @@ def unet(pretrained=False, in_channels=3, out_channels=1, pad=True, bilinear=Tru
     """
     
     # Create model with specified parameters
-    model = UNet(
+    model = _UNet(
         in_channels=in_channels,
         out_channels=out_channels,
         pad=pad,
@@ -201,27 +201,6 @@ def unet_transconv(pretrained=False, in_channels=3, out_channels=1, **kwargs):
         bilinear=False,  # Use transposed convolution
         **kwargs
     )
-
-
-# Utility functions for users
-def list_models():
-    """
-    List all available U-Net model variants
-    
-    Returns:
-        list: Available model names that can be loaded with torch.hub.load()
-        
-    Example:
-        >>> models = torch.hub.list('sm00thix/unet')
-        >>> print("Available models:", models)
-    """
-    return [
-        'unet',
-        'unet_bn', 
-        'unet_ln',
-        'unet_medical',
-        'unet_transconv'
-    ]
 
 
 def model_info(model_name='unet'):
