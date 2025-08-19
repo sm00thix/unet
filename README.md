@@ -9,7 +9,7 @@ If you use the code shared in this repository, please cite this work: https://ar
 ## Options
 The UNet class provides two options for upsampling:
 1. bilinear = False: Transposed convolution with a 2x2 kernel applied with stride 2.
-2. bilinear = True: Bilinear upsampling followed by convolution with a 1x1 kernel applied with stride 1.
+2. bilinear = True: Factor 2 bilinear upsampling followed by convolution with a 1x1 kernel applied with stride 1.
 Regardless of the choice of upsampling, the number of convolution (or transposed convolution) filters (output channels) are equal to half the number of input channels.
 
 There are also options for padding.
