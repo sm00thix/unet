@@ -287,7 +287,10 @@ class ExpansionBlock(nn.Module):
             pad_top = diff_h // 2
             pad_bottom = diff_h - pad_top
             x = F.pad(
-                x, (pad_left, pad_right, pad_top, pad_bottom), mode="constant", value=0.0
+                x,
+                (pad_left, pad_right, pad_top, pad_bottom),
+                mode="constant",
+                value=0.0,
             )
         x = copy_and_crop(large, x)
         x = self.conv_block(x)
@@ -301,10 +304,6 @@ class UNet(nn.Module):
 
     out_channels : int\\
         Number of output channels
-
-    return_logits : bool, default=False\\
-        If True, the model returns logits (raw output before sigmoid activation).
-        If False, the model applies a sigmoid activation to the output.
 
     pad : bool, default=True\\
         If True use padding in the convolution layers, preserving the input size.
@@ -324,7 +323,6 @@ class UNet(nn.Module):
         self,
         in_channels: int,
         out_channels: int,
-        return_logits: bool = False,
         pad: bool = True,
         bilinear: bool = True,
         normalization: None | str = None,
@@ -332,7 +330,6 @@ class UNet(nn.Module):
         super().__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.return_logits = return_logits
         self.pad = pad
         self.bilinear = bilinear
         self.normalization = normalization
@@ -357,8 +354,6 @@ class UNet(nn.Module):
         self.last_conv = nn.Conv2d(
             self.intermediate_channels[0], out_channels, kernel_size=1
         )
-        if not self.return_logits:
-            self.sigmoid = nn.Sigmoid()
 
         self.contraction1 = self._get_contraction_block(
             in_channels=self.intermediate_channels[0],
@@ -439,8 +434,4 @@ class UNet(nn.Module):
         x = self.expansion2(x2, x)
         x = self.expansion1(x1, x)
         x = self.last_conv(x)
-        if self.return_logits:
-            return x
-        else:
-            x = self.sigmoid(x)
         return x
