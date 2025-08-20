@@ -203,71 +203,6 @@ def unet_transconv(pretrained=False, in_channels=3, out_channels=1, **kwargs):
     )
 
 
-def model_info(model_name="unet"):
-    """
-    Get detailed information about a specific model variant
-
-    Args:
-        model_name (str): Name of the model variant
-
-    Returns:
-        dict: Detailed information about the model
-
-    Example:
-        >>> info = torch.hub.load('sm00thix/unet', 'model_info', model_name='unet_bn')
-        >>> print(info['description'])
-    """
-    info_dict = {
-        "unet": {
-            "description": "Standard U-Net with configurable parameters",
-            "intermediate_channels": [64, 128, 256, 512, 1024],
-            "default_params": {
-                "in_channels": 3,
-                "out_channels": 1,
-                "pad": True,
-                "bilinear": True,
-                "normalization": None,
-            },
-            "use_cases": ["General semantic segmentation", "Custom configuration"],
-        },
-        "unet_bn": {
-            "description": "U-Net with Batch Normalization",
-            "intermediate_channels": [64, 128, 256, 512, 1024],
-            "default_params": {"normalization": "bn"},
-            "use_cases": ["May stabilize training with large batch sizes"],
-        },
-        "unet_ln": {
-            "description": "U-Net with Layer Normalization",
-            "intermediate_channels": [64, 128, 256, 512, 1024],
-            "default_params": {"normalization": "ln"},
-            "use_cases": ["May stabilize training with small batch sizes"],
-        },
-        "unet_medical": {
-            "description": "U-Net optimized for medical image segmentation",
-            "intermediate_channels": [64, 128, 256, 512, 1024],
-            "default_params": {
-                "in_channels": 1,
-                "out_channels": 1,
-            },
-            "use_cases": ["Medical image segmentation", "Grayscale images"],
-        },
-        "unet_transconv": {
-            "description": "U-Net with transposed convolution upsampling",
-            "intermediate_channels": [64, 128, 256, 512, 1024],
-            "default_params": {"bilinear": False},
-            "use_cases": [
-                "Implemented for consistency with the original U-Net paper",
-                "Typically not recommended as it may introduce checkerboard artifacts",
-            ],
-        },
-    }
-
-    return info_dict.get(
-        model_name,
-        f"Model '{model_name}' not found. Available models: {list(info_dict.keys())}",
-    )
-
-
 # Example usage for documentation
 _EXAMPLE_USAGE = """
 # Load and use U-Net models
@@ -296,8 +231,4 @@ with torch.no_grad():
 # List all available models
 available_models = torch.hub.list('sm00thix/unet')
 print(f"Available models: {available_models}")
-
-# Get model information
-info = torch.hub.load('sm00thix/unet', 'model_info', model_name='unet_bn')
-print(f"Model info: {info}")
 """
