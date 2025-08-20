@@ -2,7 +2,7 @@
 This repository contains an implementation of U-Net [[1]](#references). [unet.py](https://github.com/sm00thix/unet/blob/main/unet.py) implements the class UNet. The implementation has been tested with PyTorch 2.7.1 and CUDA 12.6.
 ![](./assets/unet_diagram.png)
 
-You can also load the U-Net from PyTorch Hub.
+You can load the U-Net from PyTorch Hub.
 ```python
 import torch
 
@@ -16,6 +16,14 @@ model = torch.hub.load('sm00thix/unet', 'unet', pretrained=False, in_channels=3,
 # model = torch.hub.load('sm00thix/unet', 'unet_medical', **kwargs) # Convenience function equivalent to torch.hub.load('sm00thix/unet', 'unet', in_channels=1, out_channels=1, **kwargs)
 # or
 # model = torch.hub.load('sm00thix/unet', 'unet_transconv', **kwargs) # Convenience function equivalent to torch.hub.load('sm00thix/unet', 'unet', bilinear=False, **kwargs)
+```
+
+You can also clone this repository to access the U-Net directly.
+```python
+import torch
+from unet import UNet
+
+model = UNet(in_channels=3, out_channels=1, pad=True, bilinear=True, normalization=None)
 ```
 
 ## Options
