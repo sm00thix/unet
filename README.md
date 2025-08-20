@@ -9,15 +9,15 @@ The UNet class provides the following options for customization.
     `in_channels` is the number of channels in the input image.
     `out_channels` is the number of channels in the output image.
 2. Upsampling
-    1. bilinear = False: Transposed convolution with a 2x2 kernel applied with stride 2. This is followed by a ReLU.
-    2. bilinear = True: Factor 2 bilinear upsampling followed by convolution with a 1x1 kernel applied with stride 1.
+    1. `bilinear = False`: Transposed convolution with a 2x2 kernel applied with stride 2. This is followed by a ReLU.
+    2. `bilinear = True`: Factor 2 bilinear upsampling followed by convolution with a 1x1 kernel applied with stride 1.
 3. Padding
-    1. pad = True: The input size is retained in the output by zero-padding convolutions and, if necessary, the results of the upsampling operations.
-    2. pad = False: The output is smaller than the input as in the original implementation. In this case, every 3x3 convolution layer reduces the height and width by 2 pixels each. Consequently, the right side of the U-Net has a smaller spatial size than the left size. Therefore, before concatenating, the central slice of the left tensor is cropped along the spatial dimensions to match those of the right tensor.
+    1. `pad = True`: The input size is retained in the output by zero-padding convolutions and, if necessary, the results of the upsampling operations.
+    2. `pad = False`: The output is smaller than the input as in the original implementation. In this case, every 3x3 convolution layer reduces the height and width by 2 pixels each. Consequently, the right side of the U-Net has a smaller spatial size than the left size. Therefore, before concatenating, the central slice of the left tensor is cropped along the spatial dimensions to match those of the right tensor.
 4. Normalization following the ReLU which follows each convolution and transposed convolution.
-    1. normalization = None: Applies no normalization.
-    2. normalization = "bn": Applies batch normalization [[2]](#references).
-    3. normalization = "ln": Applies layer normalization [[3]](#references). A permutation of dimensions is performed before the layer to ensure normalization is applied over the channel dimension. Afterward, the dimensions are permuted back to their original order.
+    1. `normalization = None`: Applies no normalization.
+    2. `normalization = "bn"`: Applies batch normalization [[2]](#references).
+    3. `normalization = "ln"`: Applies layer normalization [[3]](#references). A permutation of dimensions is performed before the layer to ensure normalization is applied over the channel dimension. Afterward, the dimensions are permuted back to their original order.
 
 In particular, setting bilinear = False, pad = False, and normalization = None will yield the U-Net as originally designed. Generally, however, bilinear = True is recommended to avoid checkerboard artifacts.
 
