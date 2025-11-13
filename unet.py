@@ -86,7 +86,7 @@ class Permute(nn.Module):
         return x.permute(self.dims)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({", ".join(map(str, self.dims))})'
+        return f"{self.__class__.__name__}({', '.join(map(str, self.dims))})"
 
 
 def layer_norm(in_channels: int) -> nn.Sequential:
@@ -317,6 +317,12 @@ class UNet(nn.Module):
         If None use no normalization.
         If 'bn' use batch normalization.
         If 'ln' use layer normalization.
+
+    depth: int, default=5\\
+        The depth of the U-Net. This is the number of steps in the encoder and decoder
+        paths. This is one less than the number of downsampling and upsampling blocks.
+        The number of intermediate channels is 64*2**depth, i.e.
+        [64, 128, 256, 512, 1024] for depth = 5.
     """
 
     def __init__(
@@ -326,6 +332,7 @@ class UNet(nn.Module):
         pad: bool = True,
         bilinear: bool = True,
         normalization: None | str = None,
+        depth: int = 5,
     ):
         super().__init__()
         self.in_channels = in_channels
@@ -333,6 +340,7 @@ class UNet(nn.Module):
         self.pad = pad
         self.bilinear = bilinear
         self.normalization = normalization
+        self.depth = depth
         if self.normalization not in [None, "bn", "ln"]:
             raise ValueError(
                 "Normalization must be None, 'bn' for batch normalization,"
@@ -342,7 +350,7 @@ class UNet(nn.Module):
         # If normalization is used, bias is already included in the normalization layer
         self.bias_conv = normalization is None
         self.non_linearity = nn.ReLU(inplace=True)
-        self.intermediate_channels = [64 * 2**i for i in range(5)]
+        self.intermediate_channels = [64 * 2**i for i in range(self.depth)]
         self.first_convs = conv_block(
             in_channels=in_channels,
             out_channels=self.intermediate_channels[0],
@@ -354,39 +362,7 @@ class UNet(nn.Module):
         self.last_conv = nn.Conv2d(
             self.intermediate_channels[0], out_channels, kernel_size=1
         )
-
-        self.contraction1 = self._get_contraction_block(
-            in_channels=self.intermediate_channels[0],
-            out_channels=self.intermediate_channels[1],
-        )
-        self.contraction2 = self._get_contraction_block(
-            in_channels=self.intermediate_channels[1],
-            out_channels=self.intermediate_channels[2],
-        )
-        self.contraction3 = self._get_contraction_block(
-            in_channels=self.intermediate_channels[2],
-            out_channels=self.intermediate_channels[3],
-        )
-        self.contraction4 = self._get_contraction_block(
-            in_channels=self.intermediate_channels[3],
-            out_channels=self.intermediate_channels[4],
-        )
-        self.expansion4 = self._get_expansion_block(
-            in_channels=self.intermediate_channels[4],
-            out_channels=self.intermediate_channels[3],
-        )
-        self.expansion3 = self._get_expansion_block(
-            in_channels=self.intermediate_channels[3],
-            out_channels=self.intermediate_channels[2],
-        )
-        self.expansion2 = self._get_expansion_block(
-            in_channels=self.intermediate_channels[2],
-            out_channels=self.intermediate_channels[1],
-        )
-        self.expansion1 = self._get_expansion_block(
-            in_channels=self.intermediate_channels[1],
-            out_channels=self.intermediate_channels[0],
-        )
+        self._build_contraction_expansion_blocks()
 
         # Init weights
         for m in self.modules():
@@ -397,6 +373,28 @@ class UNet(nn.Module):
             elif isinstance(m, (nn.BatchNorm2d, nn.LayerNorm)):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
+
+    def _build_contraction_expansion_blocks(self) -> None:
+        """
+        Build contraction and expansion blocks dynamically based on depth.
+        Creates contraction blocks from intermediate_channels[0] to intermediate_channels[depth-1]
+        and expansion blocks from intermediate_channels[depth-1] back to intermediate_channels[0].
+        """
+        # Build contraction blocks (going down from 0 to depth-1)
+        for i in range(self.depth - 1):
+            block = self._get_contraction_block(
+                in_channels=self.intermediate_channels[i],
+                out_channels=self.intermediate_channels[i + 1],
+            )
+            setattr(self, f"contraction{i + 1}", block)
+
+        # Build expansion blocks (going up from depth-1 back to 0)
+        for i in range(self.depth - 1, 0, -1):
+            block = self._get_expansion_block(
+                in_channels=self.intermediate_channels[i],
+                out_channels=self.intermediate_channels[i - 1],
+            )
+            setattr(self, f"expansion{i}", block)
 
     def _get_contraction_block(
         self, in_channels: int, out_channels: int
@@ -424,14 +422,23 @@ class UNet(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x1 = self.first_convs(x)
-        x2 = self.contraction1(x1)
-        x3 = self.contraction2(x2)
-        x4 = self.contraction3(x3)
-        x5 = self.contraction4(x4)
-        x = self.expansion4(x4, x5)
-        x = self.expansion3(x3, x)
-        x = self.expansion2(x2, x)
-        x = self.expansion1(x1, x)
+        # Apply first convolution block
+        x = self.first_convs(x)
+
+        # Store outputs from contraction path for skip connections
+        contraction_outputs = [x]
+
+        # Contraction path (encoder)
+        for i in range(1, self.depth):
+            contraction_block = getattr(self, f"contraction{i}")
+            x = contraction_block(x)
+            contraction_outputs.append(x)
+
+        # Expansion path (decoder)
+        for i in range(self.depth - 1, 0, -1):
+            expansion_block = getattr(self, f"expansion{i}")
+            x = expansion_block(contraction_outputs[i - 1], x)
+
+        # Final 1x1 convolution
         x = self.last_conv(x)
         return x

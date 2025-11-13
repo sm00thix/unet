@@ -20,6 +20,7 @@ def unet(
     pad=True,
     bilinear=True,
     normalization=None,
+    depth=5,
     **kwargs,
 ):
     """
@@ -40,6 +41,10 @@ def unet(
                                    - 'bn': Batch normalization
                                    - 'ln': Layer normalization
                                    (default: None)
+        depth (int): The depth of the U-Net. This is the number of steps in the encoder and decoder
+        paths. This is one less than the number of downsampling and upsampling blocks.
+        The number of intermediate channels is 64*2**depth, i.e.
+        [64, 128, 256, 512, 1024] for depth = 5.
         **kwargs: Additional arguments (currently unused but available for future extensions)
 
     Returns:
@@ -85,6 +90,7 @@ def unet(
         pad=pad,
         bilinear=bilinear,
         normalization=normalization,
+        depth=depth,
     )
 
     if pretrained:
@@ -220,6 +226,9 @@ model = torch.hub.load('sm00thix/unet', 'unet_medical', pretrained=False)
 
 # Original U-Net with transposed convolution upsampling and no padding
 model = torch.hub.load('sm00thix/unet', 'unet', pretrained=False, in_channels=1, out_channels=1, pad=False, bilinear=False, normalization=None)
+
+# U-Net with depth 3
+model = torch.hub.load('sm00thix/unet', 'unet', pretrained=False, depth=3)
 
 # Example forward pass
 model = torch.hub.load('sm00thix/unet', 'unet', pretrained=False)
