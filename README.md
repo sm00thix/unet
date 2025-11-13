@@ -7,7 +7,7 @@ You can load the U-Net from PyTorch Hub.
 import torch
 
 # These are the default parameters. They are written out for clarity. Currently no pretrained weights are available.
-model = torch.hub.load('sm00thix/unet', 'unet', pretrained=False, in_channels=3, out_channels=1, pad=True, bilinear=True, normalization=None)
+model = torch.hub.load('sm00thix/unet', 'unet', pretrained=False, in_channels=3, out_channels=1, pad=True, bilinear=True, normalization=None, depth=5)
 # or
 # model = torch.hub.load('sm00thix/unet', 'unet_bn', **kwargs) # Convenience function equivalent to torch.hub.load('sm00thix/unet', 'unet', normalization='bn', **kwargs)
 # or
